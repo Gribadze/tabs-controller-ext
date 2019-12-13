@@ -1,12 +1,13 @@
 {
-  "name": "",
-  "description": "",
+  "name": "tabs-controller-ext",
+  "description": "Tabs controller extension for Google Chrome/Chromium",
   "scripts": {
     "test": "jest",
     "coverage": "jest --coverage",
-    "start": "node src",
+    "start": "webpack --mode development --watch --colors",
     "lint": "eslint ./src --fix",
-    "prettier": "prettier ./src/**/*.* --write"
+    "prettier": "prettier ./src/**/*.* --write",
+    "build": "webpack --mode production"
   },
   "husky": {
     "hooks": {
@@ -21,12 +22,19 @@
     ]
   },
   "devDependencies": {
+    "@types/chrome": "0.0.91",
     "@types/jest": "^24.0.23",
     "@types/node": "^12.12.17",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.1.1",
     "eslint": "^6.7.2",
+    "file-loader": "^5.0.2",
     "husky": "^3.1.0",
     "jest": "^24.9.0",
     "lint-staged": "^9.5.0",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
   }
 }
