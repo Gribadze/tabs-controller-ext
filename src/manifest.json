@@ -1,0 +1,11 @@
+{
+  "name": "Tabs controller",
+  "version": "1.0",
+  "description": "Tabs controller extension for Google Chrome/Chromium",
+  "permissions": ["storage", "tabs"],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "manifest_version": 2
+}
