@@ -9,29 +9,40 @@ const plugins = [
   new CopyWebpackPlugin([{ from: 'src/manifest.json', to: 'manifest.json' }]),
 ];
 
-const prodPlugins = [new UglifyJsPlugin()];
-
 const devConfig = {
   devtool: 'source-map',
 };
 
-const config = (mode) =>
-  Object.assign(
-    {},
-    {
-      entry: {
-        background: path.resolve(__dirname, 'src/background.js'),
-      },
-      output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'build'),
-      },
-      plugins: mode === 'production' ? [].concat(plugins, prodPlugins) : plugins,
-    },
-    mode === 'production' ? {} : devConfig,
-  );
+const prodConfig = {
+  optimization: {
+    minimizer: [new UglifyJsPlugin()],
+  },
+};
+
+const config = {
+  entry: {
+    background: path.resolve(__dirname, 'src/background.js'),
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'build'),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'babel-loader',
+        }
+      }
+    ]
+  }
+};
+
+const getConfig = (mode) =>
+  Object.assign({}, config, { plugins }, mode === 'production' ? prodConfig : devConfig);
 
 module.exports = (env, argv) => {
   const mode = argv.mode ? argv.mode : 'development';
-  return config(mode);
+  return getConfig(mode);
 };

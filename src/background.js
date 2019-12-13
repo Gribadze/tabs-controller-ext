@@ -2,12 +2,6 @@ const Storage = require('./core/Storage');
 
 const storage = new Storage();
 
-chrome.runtime.onInstalled.addListener(function() {
-  chrome.storage.sync.get({ color: '#3aa757' }, function() {
-    console.log('The color is green.');
-  });
-});
-
 chrome.tabs.query({}, function(tabs) {
   console.log('tabs.query', tabs);
   tabs.forEach((tab) => {
