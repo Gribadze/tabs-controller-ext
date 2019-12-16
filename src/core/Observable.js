@@ -1,4 +1,4 @@
-class Observable {
+export default class Observable {
   constructor() {
     this.subscribers = [];
   }
@@ -14,5 +14,3 @@ class Observable {
     this.subscribers.forEach((handler) => handler(...args));
   }
 }
-
-module.exports = Observable;

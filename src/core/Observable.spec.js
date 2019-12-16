@@ -1,4 +1,4 @@
-const Observable = require('./Observable');
+import Observable from './Observable';
 
 describe('Observable tests', () => {
   let ob;

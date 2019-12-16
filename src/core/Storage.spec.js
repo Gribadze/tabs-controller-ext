@@ -1,4 +1,4 @@
-const Storage = require('./Storage');
+import Storage from './Storage';
 
 describe('Storage tests', () => {
   let storage;
@@ -11,21 +11,39 @@ describe('Storage tests', () => {
     jest.clearAllMocks();
   });
 
-  it('should set value by key and notify subscribers', () => {
-    const key = 1;
-    const value = 2;
+  it('should call action handler according action type', () => {
+    const actionType = 1;
+    const action = {
+      type: actionType,
+    };
     const mockHandler = jest.fn();
-    storage.subscribe(mockHandler);
-    storage.set(key, value);
-    const returnedValue = storage.get(key);
-    expect(returnedValue).toBe(value);
-    expect(mockHandler).toBeCalled();
+    storage.subscribe(actionType, mockHandler);
+    storage.dispatch(action);
+    expect(mockHandler).toBeCalledWith(expect.anything(), action);
   });
 
-  it('should return empty array if key not exists', () => {
-    const key = 1;
-    const values = storage.get(key);
-    expect(values).toBeInstanceOf(Array);
-    expect(values).toHaveLength(0);
+  it('should call multiple action handler according action type', () => {
+    const actionType = 1;
+    const action = {
+      type: actionType,
+    };
+    const mockHandler1 = jest.fn();
+    const mockHandler2 = jest.fn();
+    storage.subscribe(actionType, mockHandler1);
+    storage.subscribe(actionType, mockHandler2);
+    storage.dispatch(action);
+    expect(mockHandler1).toBeCalledWith(expect.anything(), action);
+    expect(mockHandler2).toBeCalledWith(expect.anything(), action);
+  });
+
+  it('should not call action handler for other action types', () => {
+    const actionType = 1;
+    const action = {
+      type: actionType + 1,
+    };
+    const mockHandler = jest.fn();
+    storage.subscribe(actionType, mockHandler);
+    storage.dispatch(action);
+    expect(mockHandler).not.toBeCalled();
   });
 });

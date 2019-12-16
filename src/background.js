@@ -1,25 +1,56 @@
-const Storage = require('./core/Storage');
+import * as Types from './actions/types';
+import { addTabToWindow, initialize, removeTabFromWindow } from './actions';
+import ControlTabsCountEffect from './effects/control-tabs-count';
+import ControlOpenerEffect from './effects/control-opener';
+import getBrowserApi from './services';
+import storage from './storage';
 
-const storage = new Storage();
+const browserApi = getBrowserApi('chrome');
+// Storage config
 
-chrome.tabs.query({}, function(tabs) {
-  console.log('tabs.query', tabs);
-  tabs.forEach((tab) => {
-    const { windowId } = tab;
-    const windowTabs = storage.get(windowId);
-    storage.set(windowId, windowTabs.concat(tab));
+storage.subscribe(
+  Types.addTabToWindowType,
+  new ControlTabsCountEffect((action) => {
+    const {
+      payload: { tab },
+    } = action;
+    browserApi.removeTab(tab.id);
+  }).apply,
+);
+
+storage.subscribe(
+  Types.addTabToWindowType,
+  new ControlOpenerEffect((action) => {
+    const {
+      payload: { tab },
+    } = action;
+    browserApi.moveTab(tab.id, 0);
+  }).apply,
+);
+
+// Browser Api
+browserApi.onTabAttached((tabId, attachInfo) => {
+  const { newWindowId: windowId } = attachInfo;
+  chrome.tabs.get(tabId, (tab) => {
+    storage.dispatch(addTabToWindow(windowId, tab));
   });
 });
 
-chrome.tabs.onCreated.addListener(function(tab) {
-  console.log('tabs.onCreated.listener', tab);
+browserApi.onTabCreated((tab) => {
   const { windowId } = tab;
-  const windowTabs = storage.get(windowId);
-  storage.set(windowId, windowTabs.concat(tab));
+  storage.dispatch(addTabToWindow(windowId, tab));
 });
 
-chrome.tabs.onAttached.addListener(function(tabId, attachInfo) {
-  console.log('tabs.onAttached.listener', { tabId, attachInfo });
+browserApi.onTabDetached((tabId, detachInfo) => {
+  const { oldWindowId: windowId } = detachInfo;
+  storage.dispatch(removeTabFromWindow(windowId, tabId));
 });
 
-storage.subscribe((data) => console.log(data));
+browserApi.onTabRemoved((tabId, removeInfo) => {
+  const { windowId } = removeInfo;
+  storage.dispatch(removeTabFromWindow(windowId, tabId));
+});
+
+browserApi.getTabs({}).then((tabs) => {
+  storage.dispatch(initialize(tabs));
+});
