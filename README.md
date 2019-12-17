@@ -4,6 +4,8 @@
 
 Для сборки проекта необходим установленный [**npm**](https://npmjs.org/)
 
+Установить зависимости проекта: `npm install`
+
 ### Структура проекта
 
 `build` - каталог с собранным расширением. [Инструкция по установке расширения](https://developer.chrome.com/extensions/getstarted#manifest)
