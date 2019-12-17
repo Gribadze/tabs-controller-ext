@@ -9,7 +9,7 @@ export default class ControlTabsCountEffect extends BaseEffect {
 
   apply(data, action) {
     const {
-      payload: { windowId, tab },
+      payload: { windowId },
     } = action;
     const windowTabs = data[windowId] || [];
     if (windowTabs.length > extension.maxTabsCount) {

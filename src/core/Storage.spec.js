@@ -46,4 +46,15 @@ describe('Storage tests', () => {
     storage.dispatch(action);
     expect(mockHandler).not.toBeCalled();
   });
+
+  it('should add reducer and reduce storage according action type', () => {
+    const actionType = 1;
+    const action = {
+      type: actionType,
+    };
+    const mockReducer = jest.fn();
+    storage.addReducer(actionType, mockReducer);
+    storage.dispatch(action);
+    expect(mockReducer).toBeCalledWith(expect.anything(), action);
+  });
 });
