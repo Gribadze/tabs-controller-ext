@@ -9,14 +9,26 @@ export default class ChromeApi extends BrowserApi {
 
   removeTab(tabId) {
     return new Promise((resolve) => {
-      chrome.tabs.remove(tabId, resolve);
+      const remove = () => chrome.tabs.remove(tabId, this.withRetries(remove, resolve));
+      remove();
     });
   }
 
   moveTab(tabId, index) {
     return new Promise((resolve) => {
-      chrome.tabs.move(tabId, { index }, resolve);
+      const move = () => chrome.tabs.move(tabId, { index }, this.withRetries(move, resolve));
+      move();
     });
+  }
+
+  // case when try to modify tab while it is dragged
+  withRetries(fn, onSuccess) {
+    return (...data) => {
+      if (chrome.runtime.lastError) {
+        return setTimeout(fn, 1000);
+      }
+      onSuccess(...data);
+    };
   }
 
   onTabAttached(handler) {

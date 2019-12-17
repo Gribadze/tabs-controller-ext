@@ -1,32 +1,30 @@
 import * as Types from './actions/types';
 import { addTabToWindow, initialize, removeTabFromWindow } from './actions';
-import ControlTabsCountEffect from './effects/control-tabs-count';
-import ControlOpenerEffect from './effects/control-opener';
 import getBrowserApi from './services';
 import storage from './storage';
+import { extension } from './config';
 
 const browserApi = getBrowserApi('chrome');
-// Storage config
 
-storage.subscribe(
-  Types.addTabToWindowType,
-  new ControlTabsCountEffect((action) => {
-    const {
-      payload: { tab },
-    } = action;
+// Effects
+storage.subscribe(Types.addTabToWindowType, (data, action) => {
+  const {
+    payload: { windowId, tab },
+  } = action;
+  const windowTabs = data[windowId] || [];
+  if (windowTabs.length > extension.maxTabsCount) {
     browserApi.removeTab(tab.id);
-  }).apply,
-);
+  }
+});
 
-storage.subscribe(
-  Types.addTabToWindowType,
-  new ControlOpenerEffect((action) => {
-    const {
-      payload: { tab },
-    } = action;
+storage.subscribe(Types.addTabToWindowType, (data, action) => {
+  const {
+    payload: { tab },
+  } = action;
+  if (!tab.openerTabId) {
     browserApi.moveTab(tab.id, 0);
-  }).apply,
-);
+  }
+});
 
 // Browser Api
 browserApi.onTabAttached((tabId, attachInfo) => {
